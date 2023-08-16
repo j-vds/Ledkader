@@ -17,6 +17,7 @@ class StripClock
 
         void sync();
         bool update();
+        void updateStrip(Adafruit_NeoPixel* strip, bool* stopEffect);
         void showStatus();
         void showStatus(uint8_t status);
         void draw();
