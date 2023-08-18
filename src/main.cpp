@@ -35,6 +35,8 @@ static uint8_t effectState = 0;
 static uint8_t stateAmount = 0;
 bool stopEffect = false;
 
+bool netConnected = false;
+
 uint8_t currentMatrix[nLEDS] = {0};
 
 // constant
@@ -71,7 +73,7 @@ EffectFunc effects[] = {
 
 IRAM_ATTR void changeState()
 {
-  if(!stopEffect && (millis() - lastSwitchTime > switchPeriod))
+  if(displayMode == displayMode_t::DISP_NORMAL && (millis() - lastSwitchTime > switchPeriod))
   {
   Serial.println("triggered");
   effectState = ++effectState % stateAmount;//(uint8_t)STATES;
@@ -103,7 +105,7 @@ IRAM_ATTR void changeAP()
   else 
   {
     displayMode = displayMode_t::DISP_NORMAL;
-    effectState == stateAmount - 1;
+    effectState = stateAmount - 1;
   }
 
   stopEffect = true;
@@ -154,14 +156,42 @@ void setup() {
 void loop() {
   // Some example procedures showing how to display to the pixels
   // Clock c = Clock();
-
-
-  if(effects[effectState] != nullptr)
+  if(displayMode == displayMode_t::DISP_NORMAL)
   {
-  effects[effectState](&strip, &stopEffect);
+    if(netConnected)
+    {
+      netDisconnect();
+    }
+
+    if(effects[effectState] != nullptr)
+    {
+    effects[effectState](&strip, &stopEffect);
+    }
+    delay(50);
+    stopEffect = false;
+  } 
+  else
+  {
+    // WEBSERVER MODE - NO DELAYS!
+    // make sure there is a connection
+    if(!netConnected)
+    {
+      // connect to net
+      if(netConnect(&strip) < 0)
+      {
+        // failed to connect to the web :(
+        displayMode = displayMode_t::DISP_NORMAL;
+        effectState = 0;
+        stopEffect = true;
+      } else {
+        netConnected = true;
+        strip.setPixelColor(255, strip.Color(0,0,127));
+        strip.show();
+      }
+    }
+    updateServers();
   }
-  delay(50);
-  stopEffect = false;
+
 }
 
 void clockUpdate(Adafruit_NeoPixel* strip, bool* stopEffect)

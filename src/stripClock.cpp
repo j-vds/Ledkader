@@ -199,6 +199,5 @@ inline const uint8_t* numHelper(uint8_t value)
         case 9:
         default:
             return pattern::num9;
-
     }
 };
