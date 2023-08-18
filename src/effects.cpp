@@ -37,9 +37,10 @@ void drawNameRB(Adafruit_NeoPixel* strip, bool* stopEffect)
 
 void colorStrips(Adafruit_NeoPixel* strip, bool* stopEffect)
 {
-    colorWipe(strip, stopEffect, strip->Color(255, 0, 0), 25); // Red
-    colorWipe(strip, stopEffect, strip->Color(0, 255, 0), 25); // Green
-    colorWipe(strip, stopEffect, strip->Color(0, 0, 255), 25); // Blue
+    colorWipe(strip, stopEffect, strip->Color(127, 0, 0), 25); // Red
+    colorWipe(strip, stopEffect, strip->Color(0, 127, 0), 25); // Green
+    colorWipe(strip, stopEffect, strip->Color(0, 0, 127), 25); // Blue
+    colorWipe(strip, stopEffect, strip->Color(127,127,0), 25); // Yellow
 }
 
 void drawRainbow(Adafruit_NeoPixel* strip, bool* stopEffect)
@@ -52,31 +53,49 @@ void drawCarBlue(Adafruit_NeoPixel* strip, bool* stopEffect)
     drawMemOffset(strip, pattern::car, colOffset, true);
     drawMemOffset(strip, pattern::carWheel, colOffset, false, strip->Color(128,15,25));
     drawMemOffset(strip, pattern::carInternal, colOffset, false, strip->Color(55, 40, 175));
-      strip->show();
-
-      colOffset += 2;
-
-      if(colOffset >= 32)
-      {
-        colOffset = 0;
-      }
-      delay(280);
-}
-
-void drawCarGreen(Adafruit_NeoPixel* strip, bool* stopEffect)
-{
-    drawMemOffset(strip, pattern::car, colOffset, true, strip->Color(65, 255, 45));
-    drawMemOffset(strip, pattern::carWheel, colOffset, false, strip->Color(180,140,25));
-    drawMemOffset(strip, pattern::carInternal, colOffset, false, strip->Color(110, 205, 105));
     strip->show();
 
     colOffset += 2;
 
     if(colOffset >= 32)
     {
-    colOffset = 0;
+      colOffset = 0;
     }
-    delay(280);
+    delay(250);
+}
+
+void drawCarGreen(Adafruit_NeoPixel* strip, bool* stopEffect)
+{
+  drawMemOffset(strip, pattern::car, colOffset, true, strip->Color(65, 255, 45));
+  drawMemOffset(strip, pattern::carWheel, colOffset, false, strip->Color(180,140,25));
+  drawMemOffset(strip, pattern::carInternal, colOffset, false, strip->Color(110, 205, 105));
+  strip->show();
+
+  colOffset += 2;
+
+  if(colOffset >= 32)
+  {
+  colOffset = 0;
+  }
+  delay(250);
+}
+
+void theaterChase(Adafruit_NeoPixel* strip, bool* stopEffect)
+{
+  AFtheaterChase(strip, stopEffect, strip->Color(127, 127, 127),100);
+  AFtheaterChase(strip, stopEffect, strip->Color( 30,  40,  50),100);
+  AFtheaterChase(strip, stopEffect, strip->Color(  0, 123, 123),100);
+}
+
+
+/**
+ * Always LAST EFFECT
+*/
+void noImage(Adafruit_NeoPixel* strip, bool* stopEffect)
+{
+  strip->clear();
+  strip->show();
+  delay(50);
 }
 
 /**
@@ -114,6 +133,7 @@ void AFtheaterChase(Adafruit_NeoPixel* strip, bool* stopEffect, uint32_t c, uint
   for (int j=0; j<10; j++) {  //do 10 cycles of chasing
     for (int q=0; q < 3; q++) {
       for (uint16_t i=0; i < strip->numPixels(); i=i+3) {
+        if(*stopEffect) return;
         strip->setPixelColor(i+q, c);    //turn every third pixel on
       }
       strip->show();

@@ -3,43 +3,17 @@
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
-#include <ESPAsyncWebServer.h>
+#include <ESP8266mDNS.h>
+#include <ESP8266WebServer.h>
 
-IPAddress local_IP(4,3,2,1);
-IPAddress gateway(4,3,2,1);
-IPAddress subnet(255,255,255,0);
+//https://tttapa.github.io/ESP8266/Chap14%20-%20WebSocket.html
 
-AsyncWebServer server(80);
+void startmDNS(const char* mDMSname);
 
-void setupSoftAP()
-{
-    WiFi.softAPConfig(local_IP, gateway, subnet);
-    bool result = WiFi.softAP("ledkader", "");
-    Serial.println(WiFi.softAPIP());
-    if(result)
-    {
-        Serial.println("SUCCES!");
-    } else {
-        Serial.println("SOFTAP FAILED");
-    }
+void setupSoftAP();
 
-    // Route for root / web page
-    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-        request->send(200, "text/plain", "hello world");
-    });
+void disableSoftAP();
 
-    // Start server
-    server.begin();
-    
-}
-
-void monitor()
-{
-    while(true)
-    {
-        Serial.print("connected: "); Serial.println(WiFi.softAPgetStationNum());
-        delay(500);
-    }
-}
+void monitor();
 
 #endif

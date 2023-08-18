@@ -12,6 +12,13 @@ namespace WC
     // char WIFI_PWD [] = "41690475";
 }
 
-int attempts = 5;
+int attempts = 8;
+
+const char* mDNSname = "ledkader";
+
+enum displayMode_t {
+    DISP_NORMAL = false,
+    DISP_SERVER = true,
+};
 
 #endif /*CONSTANTS*/

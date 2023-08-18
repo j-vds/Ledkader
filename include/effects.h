@@ -18,9 +18,13 @@ void drawName(Adafruit_NeoPixel* strip, bool* stopEffect);
 void drawNameRB(Adafruit_NeoPixel* strip, bool* stopEffect);
 void colorStrips(Adafruit_NeoPixel* strip, bool* stopEffect);
 void drawRainbow(Adafruit_NeoPixel* strip, bool* stopEffect);
+void theaterChase(Adafruit_NeoPixel* strip, bool* stopEffect);
 
 void drawCarBlue(Adafruit_NeoPixel* strip, bool* stopEffect);
 void drawCarGreen(Adafruit_NeoPixel* strip, bool* stopEffect);
+
+
+void noImage(Adafruit_NeoPixel* strip, bool* stopEffect);
 
 /* Adafruit effects */
 void AFrainbow(Adafruit_NeoPixel* strip, bool* stopEffect, uint8_t wait);

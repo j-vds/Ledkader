@@ -30,6 +30,7 @@ void StripClock::sync(void)
         Serial.println("WIFI status: ");
         Serial.println(WiFi.status());
 
+        showCurrentAttempt(current_attempt);
         showStatus((int) WiFi.status());
         
         if(++current_attempt > attempts)
@@ -78,12 +79,12 @@ void StripClock::sync(void)
 
 }   
 
-bool StripClock::update()
+bool StripClock::update(bool forceUpdate)
 {
     time_t now = time(nullptr);
     tm* current = localtime(&now);
 
-    if(current->tm_sec % 5 == 0)
+    if(current->tm_sec % 5 == 0 || forceUpdate)
     {
         m_minute = current->tm_min;
         m_hour = current->tm_hour;
@@ -122,28 +123,47 @@ void StripClock::showStatus()
     switch(m_syncStatus)
     {
         case WL_NO_SSID_AVAIL:
-            color = m_strip->Color(255,0,0);
+            color = m_strip->Color(127,0,0);
             break;
         case WL_CONNECTED:
-            color = m_strip->Color(0,255,0);
+            color = m_strip->Color(0,127,0);
             break;
         default:
-            color = m_strip->Color(0,0,255);
+            color = m_strip->Color(0,0,127);
     };
 
     m_strip->setPixelColor(246, color);
     m_strip->show();
 }
 
-/*
-*/
+
+void StripClock::showCurrentAttempt(uint8_t currentAttempt)
+{
+    for(uint8_t i = 239 ; i > 239 - currentAttempt ; i--)
+    {
+        m_strip->setPixelColor(i, m_strip->Color(127,127,10));
+    }
+}
 
 void StripClock::draw()
 {
     m_strip->clear();
 
-    uint32_t c = m_strip->Color(255,50,20);
-    
+    uint32_t c;
+    if(m_minute % 30 == 0)
+    {
+        // purple
+        c = m_strip->Color(159, 43, 104);
+    } 
+    else if (m_minute % 15 == 0)
+    {
+        c = m_strip->Color(95,2,37);
+    } 
+    else
+    {
+        c = m_strip->Color(255,50,20);
+    }
+
     drawMemOffset(m_strip, numHelper( (uint8_t) (m_hour / 10)), 4, true, c);
     drawMemOffset(m_strip, numHelper( m_hour % 10),10, false, c);
     drawMemOffset(m_strip, pattern::dots,14, false, c);
