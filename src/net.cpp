@@ -3,6 +3,8 @@
 #include "constants.h"
 #include "htmlPages.h"
 
+#include "stripUtils.h"
+
 IPAddress local_IP(4,3,2,1);
 IPAddress gateway(4,3,2,1);
 IPAddress subnet(255,255,255,0);
@@ -11,6 +13,7 @@ ESP8266WebServer server(80);       // Create a webserver object that listens for
 WebSocketsServer webSocket(81);
 
 bool firstSetup = true;
+
 
 void startmDNS()
 {
@@ -61,7 +64,14 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
         break;
 
     case WStype_BIN:
-        break;
+        // strip turn on specific leds
+        // all same colour for now
+        
+        hexdump(payload, length);
+        for(int i = 0; i < length; i++)
+        {
+            Serial.println(payload[i], HEX);
+        }
 
     default:
         break;
@@ -90,31 +100,36 @@ int netConnect(Adafruit_NeoPixel* strip)
     // COPIED FROM STRIPCLOCK
     // first try connecting to WiFi
     int current_attempt = 0;
-    WiFi.begin(WC::WIFI_SSID, WC::WIFI_PWD);
-    // showStatus((int) WiFi.status());
 
-    Serial.print("Connecting...");
-    while (WiFi.status() != WL_CONNECTED)
+    if(WiFi.status() != WL_CONNECTED)
     {
-        // WiFi.disconnect();
-        delay(250);
-        Serial.print(".");
-        WiFi.reconnect();
-        // WiFi.begin(WC::WIFI_SSID, WIFI_PWD);
-        WiFi.waitForConnectResult();
-        Serial.println("WIFI status: ");
-        Serial.println(WiFi.status());
 
-        showConnectAttempt(strip, current_attempt);
-        strip->show();
+        WiFi.begin(WC::WIFI_SSID, WC::WIFI_PWD);
         // showStatus((int) WiFi.status());
-        
-        if(++current_attempt > attempts)
+
+        Serial.print("Connecting...");
+        while (WiFi.status() != WL_CONNECTED)
         {
-            return -1;
+            // WiFi.disconnect();
+            delay(250);
+            Serial.print(".");
+            WiFi.reconnect();
+            // WiFi.begin(WC::WIFI_SSID, WIFI_PWD);
+            WiFi.waitForConnectResult();
+            Serial.println("WIFI status: ");
+            Serial.println(WiFi.status());
+
+            showConnectAttempt(strip, current_attempt);
+            strip->show();
+            // showStatus((int) WiFi.status());
+            
+            if(++current_attempt > attempts)
+            {
+                return -1;
+            }
         }
     }
-
+    
     Serial.print("Connected, IP address: ");
     Serial.println(WiFi.localIP());
 

@@ -21,15 +21,51 @@ const char snakePage[] PROGMEM = R"rawliteral(
 <body>
 
 <div class="btn-group">
-  <button>RESET</button>
+  <button onClick="sendRaw();">RESET</button>
   <button>UP</button>
-  <button></button>
+  <button  onclick="sendRGB();">TEST</button>
   <button>LEFT</button>
   <button>DOWN</button>
   <button>RIGHT</button>
 </div>
 
 </body>
+<script>
+var connection = new WebSocket('ws://' + location.hostname + ':81/', ['arduino']);
+connection.onopen = function () {
+  connection.send('Connect ' + new Date());
+};
+connection.onerror = function (error) {
+  console.log('WebSocket Error ', error);
+};
+connection.onmessage = function (e) {
+  console.log('Server: ', e.data);
+};
+connection.onclose = function () {
+  console.log('WebSocket connection closed');
+};
+
+function sendRGB () {
+  console.log("button pressed" );
+  connection.send("test");
+}
+
+function sendRaw(){
+  console.log("raw ");
+  blob = new Blob([0x1d,0x1a,0x22,0x25,0x2d,0x2a,0x32,0x35,0x3d,0x3a,0x42,0x45,0x4d,0x4a,0x52,0x55]);
+  connection.send(blob);
+  
+}
+
+function testJson(){
+  console.log("json");
+  const msg = {
+    "br": 10,
+    "leds": [0x1d,0x1a,0x22,0x25,0x2d,0x2a,0x32,0x35,0x3d,0x3a,0x42,0x45,0x4d,0x4a,0x52,0x55]
+  };
+  connection.send(msg);
+}
+</script>
 </html>)rawliteral";
 
 const char testPage[] PROGMEM = R"rawliteral(

@@ -9,6 +9,8 @@
 #include "constants.h"
 
 
+// #define WS_DEBUG 
+
 #define nLEDS        (uint16_t) 256
 
 #if (ESP32)
@@ -46,7 +48,11 @@ unsigned long lastSwitchTime = 0UL;
 unsigned long lastModeTime   = 0UL;
 
 // WIFI_AP STATE
+#ifndef WS_DEBUG
 displayMode_t displayMode = DISP_NORMAL; // NORMAL
+#else
+displayMode_t displayMode = DISP_SERVER; // NORMAL
+#endif
 
 void clockUpdate(Adafruit_NeoPixel* strip, bool* stopEffect);
 
@@ -152,8 +158,11 @@ void setup() {
   const uint8_t* addr = strip.getPixels();
 
   sClock = new StripClock(&strip);
+  
+  #ifndef WS_DEBUG
   sClock->sync();
-
+  #endif 
+  
   // move matrix
   currentMatrix[0] = 0x77;
 
@@ -168,7 +177,8 @@ void loop() {
   {
     if(netConnected)
     {
-      netDisconnect();
+      // LETS hope there is still a network connection :)
+      // netDisconnect();
       netConnected = false;
     }
 
@@ -200,6 +210,9 @@ void loop() {
         strip.show();
       }
     }
+    // receive binary data -> [amount, pixelnum] (colour fixed for now)
+    // this way we can easily create snake
+    // next option -> get only id of pixels that need to change !
     updateServers();
   }
 

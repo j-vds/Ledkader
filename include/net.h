@@ -11,6 +11,9 @@
 #include <Adafruit_NeoPixel.h>
 //https://tttapa.github.io/ESP8266/Chap14%20-%20WebSocket.html
 
+
+extern Adafruit_NeoPixel strip;
+
 void startmDNS();
 void startWebSocket();
 void startServer();

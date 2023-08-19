@@ -12,6 +12,18 @@ void StripClock::sync(void)
 {
     // https://github.com/scanlime/esp8266-Arduino/blob/master/tests/Time/Time.ino
     // CONNECT TO WIFI
+    int numberOfNetworks = WiFi.scanNetworks();
+
+    for(int i =0; i<numberOfNetworks; i++){
+
+        Serial.print("Network name: ");
+        Serial.println(WiFi.SSID(i));
+        Serial.print("Signal strength: ");
+        Serial.println(WiFi.RSSI(i));
+        Serial.println("-----------------------");
+
+    }
+
 
 
     int current_attempt = 0;
@@ -30,7 +42,7 @@ void StripClock::sync(void)
         Serial.println("WIFI status: ");
         Serial.println(WiFi.status());
 
-        showCurrentAttempt(current_attempt);
+        showCurrentAttempt(current_attempt+1);
         showStatus((int) WiFi.status());
         
         if(++current_attempt > attempts)
@@ -44,9 +56,15 @@ void StripClock::sync(void)
 
     // configTime("CEST", "pool.ntp.org");
 
-    configTime(3600 * 2, 0, "pool.ntp.org", "time.nist.gov");
-      Serial.println("\nWaiting for time");
+    configTime(0, 0, "pool.ntp.org", "time.nist.gov");
+    setenv("TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 0);  
+
+    delay(250);
+    Serial.println("\nWaiting for time");
+
+      
     while (!time(nullptr)) {
+        
         Serial.print(".");
         delay(100);
     }
