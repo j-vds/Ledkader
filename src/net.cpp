@@ -1,6 +1,7 @@
 #include "net.h"
 
 #include "constants.h"
+#include "htmlPages.h"
 
 IPAddress local_IP(4,3,2,1);
 IPAddress gateway(4,3,2,1);
@@ -17,23 +18,30 @@ void startmDNS()
 }
 
 
-void startWebSocket() { // Start a WebSocket server
+void startWebSocket() 
+{ // Start a WebSocket server
   webSocket.begin();                          // start the websocket server
   webSocket.onEvent(webSocketEvent);          // if there's an incomming websocket message, go to function 'webSocketEvent'
   Serial.println("WebSocket server started.");
 }
 
-void startServer() { // Start a HTTP server with a file read handler and an upload handler
-  server.on("/",  HTTP_POST, []() {  // If a POST request is sent to the /edit.html address,
-    server.send(200, "text/plain", "Hello world"); 
-  });                       
+void startServer() 
+{ // Start a HTTP server with a file read handler and an upload handler
+    // create small page with 6 buttons (up, down, left, right, reset, blank)
+    server.on("/",  handleRoot);         
 
-  server.onNotFound([]() {
-    server.send(404, "text/plain", "404: Not found");
-    });   
+    server.onNotFound([]() {
+        server.send(404, "text/plain", "404: Not found");
+        });   
 
-  server.begin();     // start the HTTP server
-  Serial.println("HTTP server started.");
+    server.begin();     // start the HTTP server
+    Serial.println("HTTP server started.");
+}
+
+void handleRoot()
+{
+    server.send_P(200, "text/html", snakePage);
+    // server.send(200, "text/plain", "Hello world!");   // Send HTTP status 200 (Ok) and send some text to the browser/client
 }
 
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) 
@@ -54,6 +62,9 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
 
     case WStype_BIN:
         break;
+
+    default:
+        break;
   }
 }
 
@@ -70,6 +81,7 @@ void netDisconnect()
     // stop server and websockets - maybe not needed 
     // server.close();
     // webSocket.close();
+    Serial.println("disconnect wifi");
     WiFi.disconnect();
 }
 

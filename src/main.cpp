@@ -105,7 +105,15 @@ IRAM_ATTR void changeAP()
   else 
   {
     displayMode = displayMode_t::DISP_NORMAL;
-    effectState = stateAmount - 1;
+    if(!netConnected)
+    {
+      effectState = stateAmount - 1;
+    }
+    else
+    {
+      effectState = 0;
+    }
+    
   }
 
   stopEffect = true;
@@ -161,6 +169,7 @@ void loop() {
     if(netConnected)
     {
       netDisconnect();
+      netConnected = false;
     }
 
     if(effects[effectState] != nullptr)
@@ -177,6 +186,8 @@ void loop() {
     if(!netConnected)
     {
       // connect to net
+      strip.setPixelColor(255, strip.Color(127,0,127));
+      strip.show();
       if(netConnect(&strip) < 0)
       {
         // failed to connect to the web :(
@@ -185,7 +196,7 @@ void loop() {
         stopEffect = true;
       } else {
         netConnected = true;
-        strip.setPixelColor(255, strip.Color(0,0,127));
+        strip.setPixelColor(255, strip.Color(25,127,127));
         strip.show();
       }
     }

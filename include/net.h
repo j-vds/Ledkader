@@ -24,6 +24,8 @@ int netConnect(Adafruit_NeoPixel* strip);
 
 void showConnectAttempt(Adafruit_NeoPixel* strip, uint8_t currentAttempt);
 
+void handleRoot();
+
 // old
 void setupSoftAP();
 
